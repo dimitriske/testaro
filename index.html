@@ -16,9 +16,7 @@
     <div id="map"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/ol@latest/dist/ol.js"></script>
-    <script src="google_sheet.js"></script>
     <script>
-        // Δημιουργία του χάρτη
         const map = new ol.Map({
             target: 'map',
             layers: [
@@ -27,41 +25,45 @@
                 })
             ],
             view: new ol.View({
-                center: ol.proj.fromLonLat([23.7275, 37.9838]), // Κεντράρισμα στην Αθήνα
+                center: ol.proj.fromLonLat([23.7275, 37.9838]),
                 zoom: 6
             })
         });
 
-        // Φόρτωση δεδομένων από το Google Sheets
-        const sheetId = '1tGuuoT346pgP3d7zDpzJIbRoZYHfVoZPlacsO-s0Uuc';
-        const apiKey = 'AIzaSyAqu3QgzChl6SwH41g6HA8fPF0otbrpg3A'; // Αντικαταστήστε το με το API Key σας
+        async function loadCityData() {
+            const response = await fetch('./data/cities.json');
+            if (response.ok) {
+                const cities = await response.json();
+                cities.forEach(city => {
+                    const feature = new ol.Feature({
+                        geometry: new ol.geom.Point(ol.proj.fromLonLat(city.coords)),
+                        name: city.name
+                    });
 
-        fetchGoogleSheetData(sheetId, apiKey).then(cities => {
-            cities.forEach(city => {
-                const feature = new ol.Feature({
-                    geometry: new ol.geom.Point(ol.proj.fromLonLat(city.coords)),
-                    name: city.name
+                    feature.setStyle(new ol.style.Style({
+                        image: new ol.style.Circle({
+                            radius: 10,
+                            fill: new ol.style.Fill({ color: 'red' }),
+                            stroke: new ol.style.Stroke({ color: 'red', width: 1 })
+                        })
+                    }));
+
+                    const vectorSource = new ol.source.Vector({
+                        features: [feature]
+                    });
+
+                    const vectorLayer = new ol.layer.Vector({
+                        source: vectorSource
+                    });
+
+                    map.addLayer(vectorLayer);
                 });
+            } else {
+                console.error('Failed to load city data');
+            }
+        }
 
-                feature.setStyle(new ol.style.Style({
-                    image: new ol.style.Circle({
-                        radius: 10,
-                        fill: new ol.style.Fill({ color: 'red' }),
-                        stroke: new ol.style.Stroke({ color: 'red', width: 1 })
-                    })
-                }));
-
-                const vectorSource = new ol.source.Vector({
-                    features: [feature]
-                });
-
-                const vectorLayer = new ol.layer.Vector({
-                    source: vectorSource
-                });
-
-                map.addLayer(vectorLayer);
-            });
-        });
+        loadCityData();
     </script>
 </body>
 </html>
