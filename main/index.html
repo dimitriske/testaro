@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Διάγραμμα ChatBot</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto&display=swap"> 
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      background-color: #f4f4f4;
+      position: relative;
+    }
+
+    .diagram {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 30px;
+    }
+
+    .row {
+      display: flex;
+      justify-content: center;
+      gap: 50px;
+    }
+
+    .box {
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      text-align: center;
+      min-width: 150px;
+      display: none;
+      user-select: none;
+    }
+
+    .icon {
+      font-size: 48px;
+      margin-bottom: 10px;
+    }
+
+    .client .icon {
+      color: #3498db;
+    }
+
+    .chatbot .icon {
+      color: #9b59b6;
+    }
+
+    .box ul {
+      list-style: disc;
+      padding-left: 20px;
+      text-align: left;
+    }
+
+    .arrow {
+      width: 2px;
+      height: 50px;
+      background-color: #e74c3c;
+      position: relative;
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    .arrow::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 8px solid transparent;
+      border-top-color: #e74c3c;
+    }
+  </style>
+</head>
+<body>
+  <div class="diagram" id="diagram">
+    <div class="box client" id="box1">
+      <div class="icon">&#128512;</div>
+      <div contenteditable="false">Πελάτης</div>
+    </div>
+    <div class="arrow" id="arrow1"></div>
+    <div class="box chatbot" id="box2">
+      <div class="icon">&#129302;</div>
+      <div contenteditable="false">Τύπος ChatBot</div>
+    </div>
+    <div class="arrow" id="arrow2"></div>
+    <div class="row">
+      <div class="box" id="box3">
+        <ul contenteditable="false">
+          <li>Επαναλαμβανόμενες Εργασίες</li>
+          <li>Εξοικονόμηση Χρημάτων</li>
+          <li>Εξοικονόμηση Χρόνου</li>
+          <li>Απόλυση Υπαλλήλων;</li>
+          <li>Chatbots</li>
+        </ul>
+      </div>
+      <div class="box" id="box4">
+        <ul contenteditable="false">
+          <li>Προσαρμοσμένες Λύσεις</li>
+          <li>Προσανατολισμένο στον Πελάτη</li>
+          <li>Σε Βάθος</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const boxes = document.querySelectorAll('.box');
+    const arrows = document.querySelectorAll('.arrow');
+
+    function showElement(element) {
+      element.style.display = 'block';
+    }
+
+    window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'el-GR';
+    recognition.interimResults = false;
+    recognition.continuous = true;
+
+    recognition.addEventListener('result', (e) => {
+      const transcript = Array.from(e.results)
+        .map(result => result[0])
+        .map(result => result.transcript)
+        .join('')
+        .toLowerCase();
+
+      let state = {};
+
+      if (transcript.includes('πελάτης')) {
+        showElement(document.getElementById('box1'));
+        showElement(document.getElementById('arrow1'));
+        state.box1 = true;
+        state.arrow1 = true;
+      }
+      if (transcript.includes('τύπος')) {
+        showElement(document.getElementById('box2'));
+        showElement(document.getElementById('arrow2'));
+        state.box2 = true;
+        state.arrow2 = true;
+      }
+      if (transcript.includes('παρακάτω')) {
+        showElement(document.getElementById('box3'));
+        showElement(document.getElementById('box4'));
+        state.box3 = true;
+        state.box4 = true;
+      }
+
+      fetch('update_state.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(state)
+      });
+    });
+
+    recognition.start();
+
+    async function pollState() {
+      const response = await fetch('state.json');
+      const state = await response.json();
+
+      if (state.box1) {
+        showElement(document.getElementById('box1'));
+      }
+      if (state.arrow1) {
+        showElement(document.getElementById('arrow1'));
+      }
+      if (state.box2) {
+        showElement(document.getElementById('box2'));
+      }
+      if (state.arrow2) {
+        showElement(document.getElementById('arrow2'));
+      }
+      if (state.box3) {
+        showElement(document.getElementById('box3'));
+      }
+      if (state.box4) {
+        showElement(document.getElementById('box4'));
+      }
+
+      setTimeout(pollState, 1000);
+    }
+
+    pollState();
+  </script>
+</body>
+</html>
