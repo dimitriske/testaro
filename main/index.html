@@ -81,12 +81,40 @@
   </style>
 </head>
 <body>
-  <iframe src="diagram.html" id="iframe" style="width: 100%; height: 100%; border: none;"></iframe>
+  <div class="diagram" id="diagram">
+    <div class="box client" id="box1">
+      <div class="icon">&#128512;</div>
+      <div contenteditable="false">Πελάτης</div>
+    </div>
+    <div class="arrow" id="arrow1"></div>
+    <div class="box chatbot" id="box2">
+      <div class="icon">&#129302;</div>
+      <div contenteditable="false">Τύπος ChatBot</div>
+    </div>
+    <div class="arrow" id="arrow2"></div>
+    <div class="row">
+      <div class="box" id="box3">
+        <ul contenteditable="false">
+          <li>Επαναλαμβανόμενες Εργασίες</li>
+          <li>Εξοικονόμηση Χρημάτων</li>
+          <li>Εξοικονόμηση Χρόνου</li>
+          <li>Απόλυση Υπαλλήλων;</li>
+          <li>Chatbots</li>
+        </ul>
+      </div>
+      <div class="box" id="box4">
+        <ul contenteditable="false">
+          <li>Προσαρμοσμένες Λύσεις</li>
+          <li>Προσανατολισμένο στον Πελάτη</li>
+          <li>Σε Βάθος</li>
+        </ul>
+      </div>
+    </div>
+  </div>
 
   <script>
-    const iframe = document.getElementById('iframe');
-    const boxes = iframe.contentWindow.document.querySelectorAll('.box');
-    const arrows = iframe.contentWindow.document.querySelectorAll('.arrow');
+    const boxes = document.querySelectorAll('.box');
+    const arrows = document.querySelectorAll('.arrow');
 
     function showElement(element) {
       element.style.display = 'block';
@@ -105,17 +133,17 @@
         .join('')
         .toLowerCase();
 
-      if (transcript.includes('πελάτης')) {
-        showElement(iframe.contentWindow.document.getElementById('box1'));
-        showElement(iframe.contentWindow.document.getElementById('arrow1'));
+      if (transcript.includes('ο πελάτης με αγαπάει')) {
+        showElement(document.getElementById('box1'));
+        showElement(document.getElementById('arrow1'));
       }
       if (transcript.includes('τύπος')) {
-        showElement(iframe.contentWindow.document.getElementById('box2'));
-        showElement(iframe.contentWindow.document.getElementById('arrow2'));
+        showElement(document.getElementById('box2'));
+        showElement(document.getElementById('arrow2'));
       }
       if (transcript.includes('παρακάτω')) {
-        showElement(iframe.contentWindow.document.getElementById('box3'));
-        showElement(iframe.contentWindow.document.getElementById('box4'));
+        showElement(document.getElementById('box3'));
+        showElement(document.getElementById('box4'));
       }
     });
 
