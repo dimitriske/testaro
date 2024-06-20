@@ -166,26 +166,30 @@
     recognition.start();
 
     async function pollState() {
-      const response = await fetch('state.json');
-      const state = await response.json();
+      try {
+        const response = await fetch('state.json?cache_buster=' + new Date().getTime());
+        const state = await response.json();
 
-      if (state.box1) {
-        showElement(document.getElementById('box1'));
-      }
-      if (state.arrow1) {
-        showElement(document.getElementById('arrow1'));
-      }
-      if (state.box2) {
-        showElement(document.getElementById('box2'));
-      }
-      if (state.arrow2) {
-        showElement(document.getElementById('arrow2'));
-      }
-      if (state.box3) {
-        showElement(document.getElementById('box3'));
-      }
-      if (state.box4) {
-        showElement(document.getElementById('box4'));
+        if (state.box1) {
+          showElement(document.getElementById('box1'));
+        }
+        if (state.arrow1) {
+          showElement(document.getElementById('arrow1'));
+        }
+        if (state.box2) {
+          showElement(document.getElementById('box2'));
+        }
+        if (state.arrow2) {
+          showElement(document.getElementById('arrow2'));
+        }
+        if (state.box3) {
+          showElement(document.getElementById('box3'));
+        }
+        if (state.box4) {
+          showElement(document.getElementById('box4'));
+        }
+      } catch (error) {
+        console.error('Error fetching state:', error);
       }
 
       setTimeout(pollState, 1000);
